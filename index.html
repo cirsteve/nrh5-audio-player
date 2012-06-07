@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML5 Audio Lab</title>
+
+</head>
+<body>
+<h4>Now Playing:</h4>
+<h3 id="song"></h3>
+<p>By <span id="artist"></span> from the album <span id="album"></span></p>
+<br />
+<h4>Upcoming on this playlist</h4>
+<ol id="playlist"></ol>
+
+<button id="skip" type="button">Skip Track</button>
+<audio id="audio-player" autoplay src="" type="audio/ogg" >
+
+</audio>
+
+<script>
+
+var trackEvent = new EventSource('stream');
+
+trackEvent.addEventListener('new-track',function(message) {
+    advanceTrack(JSON.parse(message.data));
+}, false);
+
+trackEvent.addEventListener('playlist', function(message) {
+    renderPlaylist(message.data);
+}, false);
+
+var audio = document.getElementById("audio-player"),
+    song = document.getElementById("song"),
+    artist = document.getElementById("artist"),
+    album = document.getElementById("album"),
+    playlist = document.getElementById("playlist");
+
+var renderPlaylist = function(list) {
+    playlist.innerHTML = '';
+    list = JSON.parse(list);
+    list.forEach(function(track) {
+            var t = JSON.parse(track),
+                p = document.createElement("p"),
+                li = document.createElement("li");
+            console.log(t);
+            p.innerHTML = t.song + ' by ' + t.artist + ' from ' + t.album;
+            li.appendChild(p);
+            playlist.appendChild(li);
+        });
+};
+
+var advanceTrack = function(track) {
+    audio.src = track.url;
+    song.innerHTML = track.song;
+    artist.innerHTML = track.artist;
+    album.innerHTML = track.album;
+};
+
+var requestSkip = function() {
+    var req = new XMLHttpRequest();
+    req.open('GET', 'advance-track', true);
+    req.send();
+
+    if (req.status === "200") {
+        console.log(req.statusText);
+    }
+};
+document.getElementById("skip").onclick=requestSkip;
+
+</script>
+</body>
+
+
+</html>
+
