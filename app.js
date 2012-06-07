@@ -22,6 +22,8 @@ redisInit.quit();
 var skipClient = redis.createClient();
 var rc = redis.createClient();
 var rc2 = redis.createClient();
+
+//when message is broadcast over hubox:skip channel this handles the relay to user clients
 skipClient.on('message', function(channel,  message) {
     console.log('redisCLient fired: '+channel);
     rc.lpop('playlist', function(err, data) {
@@ -40,11 +42,14 @@ skipClient.on('message', function(channel,  message) {
     });
 });
 skipClient.subscribe("hubox:skip");
+
 var start = function() {
     function onRequest(request, response) {
         var path = url.parse(request.url).pathname;
+        var query = url.parse(request.url).search;
+        console.log('query is  '+query);
         console.log(typeof(route));
-        route.route(path, request, response);
+        route.route(path, request, response, query);
     }
     var server = http.createServer(onRequest);
     server.listen(8000);

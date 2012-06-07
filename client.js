@@ -1,23 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>HTML5 Audio Lab</title>
-
-</head>
-<body>
-<h4>Now Playing:</h4>
-<h3 id="song"></h3>
-<p>By <span id="artist"></span> from the album <span id="album"></span></p>
-<br />
-<h4>Upcoming on this playlist</h4>
-<ol id="playlist"></ol>
-
-<button id="skip" type="button">Skip Track</button>
-<audio id="audio-player" autoplay src="" type="audio/ogg" >
-
-</audio>
-
-<script>
 //initiate the connection to listen to server sid events on
 var trackEvent = new EventSource('stream');
 
@@ -40,8 +20,10 @@ var audio = document.getElementById("audio-player"),
 
 //utility function to render upcoming playlist
 var renderPlaylist = function(list) {
+    console.log(list);
     playlist.innerHTML = '';
     list = JSON.parse(list);
+    console.log(list);
     list.forEach(function(track) {
             var t = JSON.parse(track),
                 p = document.createElement("p"),
@@ -64,18 +46,12 @@ var advanceTrack = function(track) {
 //ajax get request to advance track url to initiate skip routine
 var requestSkip = function() {
     var req = new XMLHttpRequest();
-    req.open('GET', 'advance-track', true);
+    req.open('GET', 'advance-track', false);
     req.send();
 
-    if (req.status === "200") {
-        console.log(req.statusText);
-    }
+    //if (req.status === "200") {
+    //    console.log(req.statusText);
+    //}
 };
 document.getElementById("skip").onclick=requestSkip;
-
-</script>
-</body>
-
-
-</html>
 

@@ -1,14 +1,32 @@
 var fs = require("fs"),
     redis = require("redis");
 
-var html = fs.readFileSync('index.html', 'utf8');
+var html = fs.readFileSync('templates/index.html', 'utf8');
+var testHtml = fs.readFileSync('templates/test-index.html', 'utf8');
+var clientjs = fs.readFileSync('client.js', 'utf8');
+var testsjs = fs.readFileSync('tests.js', 'utf8');
 
-function route(path, request, response) {
+function route(path, request, response, query) {
     console.log('routing '+path);
+    if (query  === '?test') {
+        response.writeHead(200, {"Content-Type":"text/html"});
+        response.write(testHtml);
+        response.end();
+    }
     //home route, serves up the index.html file
-    if (path === '/') {
+    else if (path === '/') {
         response.writeHead(200, {"Content-Type":"text/html"});
         response.write(html);
+        response.end();
+    }
+    else if (path === '/tests.js') {
+        response.writeHead(200, {"Content-Type":"text/javascript"});
+        response.write(testsjs);
+        response.end();
+    }
+    else if (path === '/client.js') {
+        response.writeHead(200, {"Content-Type":"text/javascript"});
+        response.write(clientjs);
         response.end();
     }
     //server side event subscrition url, called on inde.html page load
@@ -23,6 +41,7 @@ function route(path, request, response) {
             console.log(err);
         });
 
+        //redis user client, listens for messages on hubox:playing and hubox:playlist and relays them to clients via server side events
         userClient.on('message', function(channel, message) {
             if (channel === 'hubox:playing') {
                 ++sessionTracks;
@@ -54,7 +73,7 @@ function route(path, request, response) {
         console.log(redisAdvance.publish);
         redisAdvance.publish("hubox:skip", "Advance the track");
         redisAdvance.quit();
-        response.writeHead(200, {"Content-Type":"text/html"});
+        response.writeHead(200, {"Content-Type":"text/plain"});
         response.write("OK");
         response.end();
     }
