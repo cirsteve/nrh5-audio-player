@@ -5,11 +5,13 @@ var html = fs.readFileSync('index.html', 'utf8');
 
 function route(path, request, response) {
     console.log('routing '+path);
+    //home route, serves up the index.html file
     if (path === '/') {
         response.writeHead(200, {"Content-Type":"text/html"});
         response.write(html);
         response.end();
     }
+    //server side event subscrition url, called on inde.html page load
     else if (path === '/stream') {
         console.log('/stream handler called');
         request.socket.setTimeout(Infinity);
@@ -43,13 +45,9 @@ function route(path, request, response) {
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive'
         });
-        response.write('event: new-track\n');
-        response.write('id: ' + 0 + '\n');
-        response.write('data: ' + "song1" + '\n\n');
-        response.write('event: playlist\n');
-        response.write('id: ' + 0 + '\n');
-        response.write('data: ' + "playlist1" + '\n\n');
+        response.write('\n');
     }
+    //skip track target url, client make get request here to trigger skip track routine
     else if (path === '/advance-track') {
         console.log('/advance-track being handled');
         var redisAdvance = redis.createClient();

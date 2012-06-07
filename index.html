@@ -18,23 +18,27 @@
 </audio>
 
 <script>
-
+//initiate the connection to listen to server sid events on
 var trackEvent = new EventSource('stream');
 
+//add new track listener onto SSE object to load new song
 trackEvent.addEventListener('new-track',function(message) {
     advanceTrack(JSON.parse(message.data));
 }, false);
 
+//add new playlist listener to render new playlsit
 trackEvent.addEventListener('playlist', function(message) {
     renderPlaylist(message.data);
 }, false);
 
+//create convenience references to dom elements
 var audio = document.getElementById("audio-player"),
     song = document.getElementById("song"),
     artist = document.getElementById("artist"),
     album = document.getElementById("album"),
     playlist = document.getElementById("playlist");
 
+//utility function to render upcoming playlist
 var renderPlaylist = function(list) {
     playlist.innerHTML = '';
     list = JSON.parse(list);
@@ -49,6 +53,7 @@ var renderPlaylist = function(list) {
         });
 };
 
+//set the audio src and html elements for new track
 var advanceTrack = function(track) {
     audio.src = track.url;
     song.innerHTML = track.song;
@@ -56,6 +61,7 @@ var advanceTrack = function(track) {
     album.innerHTML = track.album;
 };
 
+//ajax get request to advance track url to initiate skip routine
 var requestSkip = function() {
     var req = new XMLHttpRequest();
     req.open('GET', 'advance-track', true);
