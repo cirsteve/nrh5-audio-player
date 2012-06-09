@@ -13,20 +13,40 @@ function route(path, request, response, query) {
         response.write(testHtml);
         response.end();
     }
-    //home route, serves up the index.html file
-    else if (path === '/') {
-        response.writeHead(200, {"Content-Type":"text/html"});
-        response.write(html);
-        response.end();
-    }
+    //serve static tests.js file
     else if (path === '/tests.js') {
         response.writeHead(200, {"Content-Type":"text/javascript"});
         response.write(testsjs);
         response.end();
     }
+    //serve static client.js file
     else if (path === '/client.js') {
         response.writeHead(200, {"Content-Type":"text/javascript"});
         response.write(clientjs);
+        response.end();
+    }
+    //handle request for steaming .ogg file
+    else if (path === '/music') {
+        console.log('.ogg file requested');
+        //get the song file name by slicing first character off of query
+        var songFile = query.slice(1);
+        response.writeHead(200, {"Content-Type":"audio/ogg","Transfer-Encoding":"chunked"});
+        //create file stream and set callbacks for streaming the data
+        var audioStream = fs.createReadStream('tracks/'+songFile);
+        audioStream.on("error", function(exception) {
+           console.error("Error reading file: ", exception);
+         });
+         audioStream.on("data", function(data) {
+           response.write(data);
+         });
+         audioStream.on("close", function() {
+           response.end();
+         });
+    }
+    //home route, serves up the index.html file
+    else if (path === '/') {
+        response.writeHead(200, {"Content-Type":"text/html"});
+        response.write(html);
         response.end();
     }
     //server side event subscrition url, called on inde.html page load
@@ -53,6 +73,7 @@ function route(path, request, response, query) {
                 ++playlistUpdate;
                 response.write('event: playlist\n');
                 response.write('id: ' + playlistUpdate + '\n');
+                console.log('lranges'+message);
                 response.write('data: ' + message + '\n\n');
             }
         });

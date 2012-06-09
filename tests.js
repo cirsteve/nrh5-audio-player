@@ -28,7 +28,7 @@ test('advanceTrack', function() {
 });
 
 test('renderPlaylist', function() {
-    renderPlaylist([{"song":"The Next Song","artist":"Upcoming Artist","album":"From the Album","url":"http://path/to/next-file.ogg"}]);
+    renderPlaylist(JSON.stringify([JSON.stringify({song:"The Next Song",artist:"Upcoming Artist",album:"From the Album",url:"http://path/to/next-file.ogg"})]));
     ok(playlist, 'upcoming track appended to playlist element');
-    equal(playlist.firstChild.firstChild.innerHTML.split(" "), "The Next Song", "Upcoming song title is set correctly");
+    equal(playlist.firstChild.firstChild.innerHTML, "The Next Song by Upcoming Artist from From the Album", "Upcoming song info is set correctly");
 });

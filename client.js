@@ -1,3 +1,11 @@
+//create convenience references to dom elements
+var audio = document.getElementById("audio-player"),
+    song = document.getElementById("song"),
+    artist = document.getElementById("artist"),
+    album = document.getElementById("album"),
+    playlist = document.getElementById("playlist");
+
+
 //initiate the connection to listen to server sid events on
 var trackEvent = new EventSource('stream');
 
@@ -10,13 +18,6 @@ trackEvent.addEventListener('new-track',function(message) {
 trackEvent.addEventListener('playlist', function(message) {
     renderPlaylist(message.data);
 }, false);
-
-//create convenience references to dom elements
-var audio = document.getElementById("audio-player"),
-    song = document.getElementById("song"),
-    artist = document.getElementById("artist"),
-    album = document.getElementById("album"),
-    playlist = document.getElementById("playlist");
 
 //utility function to render upcoming playlist
 var renderPlaylist = function(list) {
@@ -48,10 +49,8 @@ var requestSkip = function() {
     var req = new XMLHttpRequest();
     req.open('GET', 'advance-track', false);
     req.send();
-
-    //if (req.status === "200") {
-    //    console.log(req.statusText);
-    //}
 };
+
+//bind request skip to button click hander
 document.getElementById("skip").onclick=requestSkip;
 

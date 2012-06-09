@@ -4,21 +4,23 @@ var util = require("util"),
     redis = require("redis"),
     url = require("url");
 
-var track = '{"song":"Cakewalk","artist":"Lyrics Born","album":"Same Stuff","url":"http://localhost/myhome/df/Cakewalk.ogg"}';
-var track2 = '{"song":"The World","artist":"Lyrics Born","album":"Party Stuff","url":"http://localhost/myhome/df/the-world.ogg"}';
-var track3 = '{"song":"Top Shelf","artist":"Lyrics Born","album":"Rock Out","url":"http://localhost/myhome/df/top-shelf.ogg"}';
+var track = {song:"The Only Place",artist:"Best Coast",album:"Dont Ask Me",url:"http://localhost:8000/music?the-only-place.ogg"};
+var track2 = {song:"Baby Missiles",artist:"The War On Drugs",album:"Dont Know",url:"http://localhost:8000/music?baby-missiles.ogg"};
+var track3 = {song:"Live It Up",artist:"Kid Ink",album:"Who Knows",url:"http://localhost:8000/music?live-it-up.ogg"};
+var track4 = {song:"Choose Up",artist:"Dom Kennedy",album:"Not Sure",url:"http://localhost:8000/music?choose-up.ogg"};
 
 var redisInit = redis.createClient();
 //clear playlist
 redisInit.ltrim('playlist', 2, 1);
 
 //populate playlist
-redisInit.rpush('playlist', track);
-redisInit.rpush('playlist', track2);
-redisInit.rpush('playlist', track3);
+redisInit.rpush('playlist', JSON.stringify(track));
+redisInit.rpush('playlist', JSON.stringify(track2));
+redisInit.rpush('playlist', JSON.stringify(track3));
+redisInit.rpush('playlist', JSON.stringify(track4));
 redisInit.quit();
 
-//redis clients to listen for and respond to the hubox:skip channel
+//redis clients to listen for and respond to the hubox:skip channel by publishing to hubox:playing and hubox:playlist
 var skipClient = redis.createClient();
 var rc = redis.createClient();
 var rc2 = redis.createClient();
@@ -45,9 +47,8 @@ skipClient.subscribe("hubox:skip");
 
 var start = function() {
     function onRequest(request, response) {
-        var path = url.parse(request.url).pathname;
-        var query = url.parse(request.url).search;
-        console.log('query is  '+query);
+        var path = url.parse(request.url).pathname,
+            query = url.parse(request.url).search;
         console.log(typeof(route));
         route.route(path, request, response, query);
     }
